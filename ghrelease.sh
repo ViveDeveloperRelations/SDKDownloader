@@ -50,14 +50,16 @@ if [[ ! -d $outputdirectorybase ]]; then
 fi
 
 cd "$outputdirectorybase"
+echo "Current directory is $PWD to upload to the correct repository"
 
 for version in "${versions[@]}"
 do
-    winpty gh release create "$version" -t "versions/$version" -n ""
+    #if regenerating the releases, then re-enable below line
+    #named versions/$version since i tagged them that way in the testUnzipFromTGZ script
+    winpty gh release create "versions/$version" -t "versions/$version" --verify-tag --generate-notes
 
     package_names=("com.htc.upm.wave.xrsdk" "com.htc.upm.wave.native"  "com.htc.upm.wave.essence" )
-    
-    tgzFileString=""
+
     for package in "${package_names[@]}";
     do
         tgzfile="../$package/$package-$version.tgz"
@@ -67,7 +69,8 @@ do
             continue
         fi
 
-        tgzFileString+="$tgzfile "
+        echo "winpty gh release upload "versions/$version" "/g/mirrors/sdkmirrorv1/$package/$package-$version.tgz""
+        winpty gh release upload "versions/$version" "/g/mirrors/sdkmirrorv1/$package/$package-$version.tgz"
     done
-    winpty gh release upload "versions/$version" "$tgzFileString"
+    echo "Submited files to release versions/$version"
 done
