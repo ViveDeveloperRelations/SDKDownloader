@@ -95,7 +95,6 @@ function extract_packages {
     git -C "$outputdirectory" commit -am "version $version"
     # Tag the commit with the version number
     git -C "$outputdirectory" tag -a "versions/$version" -m "version $version"
-
 }
 
 
@@ -106,4 +105,10 @@ for version in "${version_numbers[@]}"; do
     extract_packages $outputdirectorybase $version "${package_names[@]}" 
 done
 
+#origin=https://github.com/ViveDeveloperRelations/WaveNativeIndividual.git
+origin=https://github.com/ViveDeveloperRelations/WaveCombined.git
+git -C "$outputdirectorybase" remote add origin $origin
+git -C "$outputdirectorybase" push origin master
+#https://github.com/ViveDeveloperRelations/WaveNativeIndividual.git
+git -C "$outputdirectorybase" push --tags
 
