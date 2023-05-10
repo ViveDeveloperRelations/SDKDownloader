@@ -55,7 +55,7 @@ echo "Current directory is $PWD to upload to the correct repository"
 for version in "${versions[@]}"
 do
     #if regenerating the releases, then re-enable below line
-    #winpty gh release delete "versions/$version" --yes
+    #named versions/$version since i tagged them that way in the testUnzipFromTGZ script
     winpty gh release create "versions/$version" -t "versions/$version" --verify-tag --generate-notes
 
     package_names=("com.htc.upm.wave.xrsdk" "com.htc.upm.wave.native"  "com.htc.upm.wave.essence" )
