@@ -81,6 +81,8 @@
 
 #/LocalPackages (tests_withnewpackage)
 #$ find . -type f | sed -e 's/.*\.//' | sed -e 's/.*\///' | sort -u
+
+#$ find ./* -type f | sed -e 's/.*\.//' | sed -e 's/.*\///' | sort -u
 #LICENSE
 #LICENSE_WaveSDKNativeBinary
 #aar
@@ -88,20 +90,25 @@
 #apk
 #asmdef
 #asset
+#bat
 #controller
 #cs
+#default
 #dll
+#docx
 #dummy
 #exe
 #exr
 #fbx
 #gitignored
+#ini
 #inputactions
 #json
 #lighting
 #mat
 #md
 #meta
+#mtl
 #obj
 #physicMaterial
 #png
@@ -118,6 +125,7 @@
 #unitypackage
 #wav
 #xml
+
 
 *.hdr filter=lfs diff=lfs merge=lfs -text
 *.lighting filter=lfs diff=lfs merge=lfs -text
