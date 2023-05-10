@@ -1,4 +1,5 @@
 #!/bin/bash
+outputdirectorybase="essence_combined_packages/"
 
 function get_version_numbers {
     directory_to_look_for_tgz_files=$1
@@ -33,12 +34,13 @@ function get_version_numbers {
 
 tgzdirectory="com.htc.upm.wave.essence/"
 versions=($(get_version_numbers $tgzdirectory))
+cd $outputdirectorybase
 
 # Loop through the versions array
 for version in "${versions[@]}"
 do
     # Create a new release on GitHub for the current version
-    winpty gh release create $version -t $version -n ""
+    winpty gh release create $version -t versions/$version -n ""
 
     # Create a tgz file of the current version
     #tar -czvf $version.tar.gz $version/
@@ -47,12 +49,12 @@ do
     tgzFileString=""
     for package in ${package_names[@]};
     do
-        tgzfile=$package/$package-$version.tgz
+        tgzfile=../$package/$package-$version.tgz
         #echo "tgzFiles: ($tgzFileString)"
         #gh release upload $version $version.tar.gz
         tgzFileString+="$tgzfile " 
     done
     # Upload the tgz file to the GitHub release for the current version
     #gh release upload $version $version.tar.gz
-    winpty gh release upload $version $tgzFileString
+    winpty gh release upload versions/$version $tgzFileString
 done
