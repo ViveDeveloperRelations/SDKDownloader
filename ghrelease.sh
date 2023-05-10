@@ -50,10 +50,15 @@ if [[ ! -d $outputdirectorybase ]]; then
 fi
 
 cd "$outputdirectorybase"
+echo "Current directory is $PWD"
 
 for version in "${versions[@]}"
 do
-    winpty gh release create "$version" -t "versions/$version" -n ""
+    winpty gh release delete "$version" --yes
+    winpty gh release delete "versions/$version" --yes
+    #todo use --notes-start-tag to get the release notes from the tag
+    #winpty gh release create "$version" -t "versions/$version" -n "" --verify-tag 
+    winpty gh release create "versions/$version" -t "versions/$version" --verify-tag --generate-notes
 
     package_names=("com.htc.upm.wave.xrsdk" "com.htc.upm.wave.native"  "com.htc.upm.wave.essence" )
     
@@ -67,7 +72,18 @@ do
             continue
         fi
 
-        tgzFileString+="$tgzfile "
+        #tgzFileString+="..\\\\$package\\\\$package-$version.tgz "
+        #hack since it wais failing before
+        #tgzFileString+="/g/mirrors/sdkmirrorv1/$package/$package-$version.tgz "
+        #tgzFileString+="G:/mirrors/sdkmirrorv1/$package/$package-$version.tgz "
+        #multiple uploads seem to file due to file path issues
+        echo "winpty gh release upload "versions/$version" "/g/mirrors/sdkmirrorv1/$package/$package-$version.tgz""
+        winpty gh release upload "versions/$version" "/g/mirrors/sdkmirrorv1/$package/$package-$version.tgz"
     done
-    winpty gh release upload "versions/$version" "$tgzFileString"
+    echo "Submited files to release versions/$version"
+    #might need to use windows path notation here \\ instead of /
+    
+    #echo "winpty gh release upload "versions/$version" "$tgzFileString""
+    #winpty gh release upload "versions/$version" "$tgzFileString"
+    #break
 done
