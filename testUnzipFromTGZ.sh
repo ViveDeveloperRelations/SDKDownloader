@@ -73,7 +73,7 @@ function extract_packages {
     local packages=("$@")    # Now $@ contains the remaining parameters
 
     # Unzip the tgz file into the output directory
-    for package in ${packages[@]};
+    for package in "${packages[@]}";
     do
         local tgzfile=$package/$package-$version.tgz
         local package_output_directory=$outputdirectory$package
@@ -124,8 +124,8 @@ function commit_combined_branch {
     #if patch file exists, apply it
     patchfile=files_to_copy_to_repo/patch_$version.diff
     if [ -f $patchfile ]; then
-        echo "applying patch"
-        git -C "$outputdirectory" apply $patchfile
+        echo "applying patch for $version"
+        git -C "$outputdirectory" apply ../$patchfile
     fi
     git -C "$outputdirectory" add -A
     git -C "$outputdirectory" commit -am "patches for creating combined version $version"
@@ -134,8 +134,8 @@ function commit_combined_branch {
     #create a tgz file of the combined output for publishing purposes
     #create directory for tgz files if it doesn't exist
     mkdir -p "$combinedpackagename"
-
-    tar -czf "$combinedpackagename/$combinedpackagename-$version.tgz" -C "$outputdirectory" 
+    echo "tar -czf "$combinedpackagename/$combinedpackagename-$version.tgz" -C "$outputdirectory" --exclude=".git" --exclude=".gitignore" ."
+    tar -czf "$combinedpackagename/$combinedpackagename-$version.tgz" -C "$outputdirectory" --exclude=".git" --exclude=".gitignore" .
 }
 
 
@@ -147,6 +147,9 @@ for version in "${version_numbers[@]}"; do
     commit_main_branch $outputdirectorybase $version
     patch_for_combined_package $outputdirectorybase
     commit_combined_branch $outputdirectorybase $version
+
+    mainbranch="master"
+    git -C "$outputdirectorybase" checkout "$mainbranch"
 done
 
 
