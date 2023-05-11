@@ -106,9 +106,9 @@ for version in "${version_numbers[@]}"; do
 done
 
 #origin=https://github.com/ViveDeveloperRelations/WaveNativeIndividual.git
-origin=https://github.com/ViveDeveloperRelations/WaveCombined.git
+origin=https://github.com/ViveDeveloperRelations/WaveCombined_test.git
 git -C "$outputdirectorybase" remote add origin $origin
-git -C "$outputdirectorybase" push origin master
+git -C "$outputdirectorybase" push origin master --force
 #https://github.com/ViveDeveloperRelations/WaveNativeIndividual.git
-git -C "$outputdirectorybase" push --tags
+git -C "$outputdirectorybase" push --tags --force
 
