@@ -80,11 +80,12 @@ function extract_packages {
         rm -rf "$package_output_directory"
         mkdir -p "$package_output_directory"
         printf "extracting $tgzfile to $package_output_directory\n" >&2
-        tar -xzf "$tgzfile" -C "$package_output_directory/"
+        tar -xzf "$tgzfile" --strip-components=1 -C "$package_output_directory/"
     done
 
     #for testing the single-package setup working for now
     find "$outputdirectory/" -name "package.json" -type f -delete
+    find "$outputdirectory/" -name "package.json.meta" -type f -delete
     echo "all files in packages"
     ls files_to_copy_to_repo/packag*
     cp files_to_copy_to_repo/packag* "$outputdirectory/"
