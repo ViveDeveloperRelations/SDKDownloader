@@ -115,6 +115,8 @@ function commit_combined_branch {
     #create branch if branch not created in git
     if git rev-parse --verify --quiet "$combinedbranch" >/dev/null; then
         git -C "$outputdirectory" checkout "$combinedbranch"
+        #Reset the branch to the previous commit, ignore the previous patch
+        git reset --hard HEAD~1
     else
         # Create a new branch and switch to it
         git -C "$outputdirectory" checkout -b "$combinedbranch"
