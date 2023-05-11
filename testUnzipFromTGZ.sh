@@ -119,11 +119,7 @@ function commit_combined_branch {
         # Create a new branch and switch to it
         git -C "$outputdirectory" checkout -b "$combinedbranch"
     fi
-    git -C "$outputdirectory" add -A
-    git -C "$outputdirectory" commit -am "version $version"
-
-    # Tag the commit with the version number
-    git -C "$outputdirectory" tag -a "combined/$version" -m "version $version"
+    
     #apply patch if needed
     #if patch file exists, apply it
     patchfile=files_to_copy_to_repo/patch_$version.diff
