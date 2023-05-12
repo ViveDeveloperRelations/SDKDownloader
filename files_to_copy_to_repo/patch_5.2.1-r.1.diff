@@ -1,8 +1,22 @@
+diff --git a/com.htc.upm.wave.essence.meta b/com.htc.upm.wave.essence.meta
+new file mode 100644
+index 0000000..7f4f8d3
+--- /dev/null
++++ b/com.htc.upm.wave.essence.meta
+@@ -0,0 +1,8 @@
++fileFormatVersion: 2
++guid: 75d6dcfd1871fda44a0bbf8e2955a2da
++folderAsset: yes
++DefaultImporter:
++  externalObjects: {}
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
 diff --git a/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs b/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs
-index 82656fe..8482ba5 100644
+index 82656fe..f7cbf0e 100644
 --- a/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs
 +++ b/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs
-@@ -801,12 +801,22 @@ public static void CleanHouse()
+@@ -801,23 +801,26 @@ public static void CleanHouse()
  			if (File.Exists("Assets/Wave.meta"))
  				File.Delete("Assets/Wave.meta");
  		}
@@ -17,16 +31,50 @@ index 82656fe..8482ba5 100644
  			AssetDatabase.Refresh();
 -			string target = Path.Combine("Packages/" + Constants.EssencePackageName + "/UnityPackages~", packagePath);
 +			string target = Path.Combine(GetEssenceUnityPackageFolder(), packagePath);
-+			Debug.Log("Import: " + target);
-+			AssetDatabase.ImportPackage(target, false);
-+		}
-+
-+		internal static void ImportModule(string packagePath)
-+		{
+ 			Debug.Log("Import: " + target);
+ 			AssetDatabase.ImportPackage(target, false);
+ 		}
+ 
+ 		internal static void ImportModule(string packagePath)
+ 		{
+-			string target = Path.Combine("Packages/" + Constants.EssencePackageName + "/UnityPackages~", packagePath);
 +			string target = Path.Combine(GetEssenceUnityPackageFolder(), packagePath);
  			Debug.Log("Import: " + target);
  			AssetDatabase.ImportPackage(target, false);
  		}
+-
++		
+ 		[SettingsProvider]
+ 		static SettingsProvider Create()
+ 		{
+diff --git a/com.htc.upm.wave.native.meta b/com.htc.upm.wave.native.meta
+new file mode 100644
+index 0000000..7e26349
+--- /dev/null
++++ b/com.htc.upm.wave.native.meta
+@@ -0,0 +1,8 @@
++fileFormatVersion: 2
++guid: 12fd75b19a9e63b45a40fe325fc8f37e
++folderAsset: yes
++DefaultImporter:
++  externalObjects: {}
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk.meta b/com.htc.upm.wave.xrsdk.meta
+new file mode 100644
+index 0000000..2d5dff7
+--- /dev/null
++++ b/com.htc.upm.wave.xrsdk.meta
+@@ -0,0 +1,8 @@
++fileFormatVersion: 2
++guid: 48755743f6f550944b7e568e942399c4
++folderAsset: yes
++DefaultImporter:
++  externalObjects: {}
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
 diff --git a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs
 index 46006c7..47ee0d5 100644
 --- a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs
