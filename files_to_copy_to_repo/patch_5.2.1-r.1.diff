@@ -131,7 +131,7 @@ index 9952fc7..fa241a9 100644
  
                  s_Metadata.loaderMetadata = new List<IXRLoaderMetadata>() {
 diff --git a/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs b/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs
-index 84d2860..a2e770f 100644
+index 84d2860..99909f2 100644
 --- a/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs
 +++ b/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs
 @@ -126,7 +126,8 @@ public static void CleanHouse()
@@ -139,7 +139,7 @@ index 84d2860..a2e770f 100644
  		private void ImportModule(string packagePath)
  		{
 -			string target = Path.Combine("Packages/com.htc.upm.wave.xrsdk/UnityPackages~", packagePath);
-+			const string xrsdkUnityPackagesFolder = Constants.PackagesRootFolder +Constants.SDKPackageName+"/UnityPackages~";
++			const string xrsdkUnityPackagesFolder = Constants.PackagesRootFolder + "/" + Constants.SDKPackageName+"/UnityPackages~";
 +			string target = Path.Combine(xrsdkUnityPackagesFolder, packagePath);
  			Debug.Log("Import: " + target);
  			AssetDatabase.ImportPackage(target, false);
