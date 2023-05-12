@@ -1,16 +1,15 @@
 diff --git a/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs b/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs
-index 82656fe..aa36395 100644
+index 82656fe..8482ba5 100644
 --- a/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs
 +++ b/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs
-@@ -801,19 +801,23 @@ public static void CleanHouse()
+@@ -801,12 +801,22 @@ public static void CleanHouse()
  			if (File.Exists("Assets/Wave.meta"))
  				File.Delete("Assets/Wave.meta");
  		}
 -
-+		
 +		internal static string GetEssenceUnityPackageFolder()
 +		{
-+			return Constants.PackagesRootFolder + "/" + Constants.EssencePackageName+ "/UnityPackages~";
++			return Constants.PackagesRootFolder + "/" + Constants.EssencePackageName+ "/package/UnityPackages~";
 +		}
  		internal static void UpdateModule(string ModelPath, string packagePath)
  		{
@@ -18,99 +17,25 @@ index 82656fe..aa36395 100644
  			AssetDatabase.Refresh();
 -			string target = Path.Combine("Packages/" + Constants.EssencePackageName + "/UnityPackages~", packagePath);
 +			string target = Path.Combine(GetEssenceUnityPackageFolder(), packagePath);
- 			Debug.Log("Import: " + target);
- 			AssetDatabase.ImportPackage(target, false);
- 		}
- 
- 		internal static void ImportModule(string packagePath)
- 		{
--			string target = Path.Combine("Packages/" + Constants.EssencePackageName + "/UnityPackages~", packagePath);
++			Debug.Log("Import: " + target);
++			AssetDatabase.ImportPackage(target, false);
++		}
++
++		internal static void ImportModule(string packagePath)
++		{
 +			string target = Path.Combine(GetEssenceUnityPackageFolder(), packagePath);
  			Debug.Log("Import: " + target);
  			AssetDatabase.ImportPackage(target, false);
  		}
-diff --git a/com.htc.upm.wave.native/package.json.meta b/com.htc.upm.wave.native.meta
-similarity index 57%
-rename from com.htc.upm.wave.native/package.json.meta
-rename to com.htc.upm.wave.native.meta
-index 8416e28..7e26349 100644
---- a/com.htc.upm.wave.native/package.json.meta
-+++ b/com.htc.upm.wave.native.meta
-@@ -1,7 +1,8 @@
--fileFormatVersion: 2
--guid: 03ae9ad0de8a90042bfad9112832e00a
--PackageManifestImporter:
--  externalObjects: {}
--  userData: 
--  assetBundleName: 
--  assetBundleVariant: 
-+fileFormatVersion: 2
-+guid: 12fd75b19a9e63b45a40fe325fc8f37e
-+folderAsset: yes
-+DefaultImporter:
-+  externalObjects: {}
-+  userData: 
-+  assetBundleName: 
-+  assetBundleVariant: 
-diff --git a/com.htc.upm.wave.native/package.json b/com.htc.upm.wave.native/package.json
-deleted file mode 100644
-index 5fa2353..0000000
---- a/com.htc.upm.wave.native/package.json
-+++ /dev/null
-@@ -1,30 +0,0 @@
--{
--  "name": "com.htc.upm.wave.native",
--  "displayName": "VIVE Wave XR Plugin - Native",
--  "version": "5.2.1-r.1",
--  "unity": "2019.4",
--  "description": "The \"VIVE Wave XR Plugin - Native\" package provides the wraper of WaveVR.\n\nView the documentation for additional information.\n\n",
--  "keywords": [
--    "vr",
--    "xr",
--    "reality"
--  ],
--  "author": {
--    "name": "HTC Corporation",
--    "email": "vivesoftware@htc.com",
--    "url": "https://www.htc.com"
--  },
--  "dependencies": {
--    "com.htc.upm.wave.xrsdk": "5.2.1-r.1"
--  },
--  "samples": [
--    {
--      "displayName": "Native",
--      "description": "Basic sample showing how to use Wave Native.",
--      "path": "Samples~/Native/Native"
--    }
--  ],
--  "type": "library",
--  "documentationUrl": "https://hub.vive.com/storage/docs/en-us/UnityXR/UnityXRSdk.html",
--  "hideInEditor": false
--}
-diff --git a/com.htc.upm.wave.xrsdk.meta b/com.htc.upm.wave.xrsdk.meta
-new file mode 100644
-index 0000000..2d5dff7
---- /dev/null
-+++ b/com.htc.upm.wave.xrsdk.meta
-@@ -0,0 +1,8 @@
-+fileFormatVersion: 2
-+guid: 48755743f6f550944b7e568e942399c4
-+folderAsset: yes
-+DefaultImporter:
-+  externalObjects: {}
-+  userData: 
-+  assetBundleName: 
-+  assetBundleVariant: 
 diff --git a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs
-index 46006c7..0c7ae2b 100644
+index 46006c7..47ee0d5 100644
 --- a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs
 +++ b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs
 @@ -31,10 +31,12 @@ static class CustomBuildProcessor
  	{
  		private static string WaveXRPath = "Assets/Wave/XR";
  
-+		const string XRSDKPackageRoot = Constants.PackagesRootFolder + "/" + Constants.SDKPackageName;
++		const string XRSDKPackageRoot = Constants.PackagesRootFolder + "/" + Constants.SDKPackageName + "/package";
 +		
  		const string CustomAndroidManifestPathSrc = "/Platform/Android/AndroidManifest.xml";
 -		const string AndroidManifestPathSrc = "Packages/" + Constants.SDKPackageName + "/Runtime/Android/AndroidManifest.xml";
@@ -131,32 +56,6 @@ index 46006c7..0c7ae2b 100644
  				File.Copy(AndroidManifestPathSrc, AndroidManifestPathDest, false);
  			}
  
-diff --git a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs
-index f75e9ea..2a92712 100644
---- a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs
-+++ b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs
-@@ -359,7 +359,7 @@ internal void AddViveSDKVersion()
- 			{
- 				var newUsesFeature = CreateElement("meta-data");
- 				newUsesFeature.Attributes.Append(CreateAndroidAttribute("name", "com.htc.ViveWaveAndroid.SdkVersion"));
--				newUsesFeature.Attributes.Append(CreateAndroidAttribute("value", SearchPackageVersion("com.htc.upm.wave.xrsdk")));
-+				newUsesFeature.Attributes.Append(CreateAndroidAttribute("value", SearchPackageVersion(Wave.XR.Constants.CombinedPackageName)));
- 				ApplicationElement.AppendChild(newUsesFeature);
- 			}
- 
-diff --git a/com.htc.upm.wave.xrsdk/Editor/WaveXRMetadata.cs b/com.htc.upm.wave.xrsdk/Editor/WaveXRMetadata.cs
-index 9952fc7..fa241a9 100644
---- a/com.htc.upm.wave.xrsdk/Editor/WaveXRMetadata.cs
-+++ b/com.htc.upm.wave.xrsdk/Editor/WaveXRMetadata.cs
-@@ -35,7 +35,7 @@ internal static WaveXRPackageMetadata CreateAndGetMetadata()
-             {
-                 s_Metadata = new WaveXRPackageMetadata();
-                 s_Metadata.packageName = "Wave XRSDK Package";
--                s_Metadata.packageId = Constants.SDKPackageName;
-+                s_Metadata.packageId = Constants.CombinedPackageName;
-                 s_Metadata.settingsType = typeof(WaveXRSettings).FullName;
- 
-                 s_Metadata.loaderMetadata = new List<IXRLoaderMetadata>() {
 diff --git a/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs b/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs
 index 84d2860..a2e770f 100644
 --- a/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs
@@ -171,8 +70,2545 @@ index 84d2860..a2e770f 100644
  			Debug.Log("Import: " + target);
  			AssetDatabase.ImportPackage(target, false);
  		}
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libGfxWXRUnity.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libGfxWXRUnity.so.meta
+index d185856..96e35d5 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libGfxWXRUnity.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libGfxWXRUnity.so.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: 74b378b4b41b4f943bf60b79f9a9953b
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 1
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 0
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: ARM64
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 74b378b4b41b4f943bf60b79f9a9953b
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 1
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 0
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 1
++      settings:
++        CPU: ARM64
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libVkLayer_GLES_RenderDoc.1.4.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libVkLayer_GLES_RenderDoc.1.4.so.meta
+index b4397c0..70adb2f 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libVkLayer_GLES_RenderDoc.1.4.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libVkLayer_GLES_RenderDoc.1.4.so.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: da679b42564d0794bbafff5c6c21b234
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARM64
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: da679b42564d0794bbafff5c6c21b234
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARM64
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libVkLayer_GLES_RenderDoc.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libVkLayer_GLES_RenderDoc.so.meta
+index eeb3ff8..625d99c 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libVkLayer_GLES_RenderDoc.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libVkLayer_GLES_RenderDoc.so.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: d99fd93692bff1a4998cf0a37f8c7b8e
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: d99fd93692bff1a4998cf0a37f8c7b8e
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libwvrunityxr.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libwvrunityxr.so.meta
+index fc9dd57..65caebb 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libwvrunityxr.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libwvrunityxr.so.meta
+@@ -1,82 +1,88 @@
+-fileFormatVersion: 2
+-guid: fd773ec92aa19db4dba1be0c35f2ba2a
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 0
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: ARM64
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Facebook: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Facebook: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: fd773ec92aa19db4dba1be0c35f2ba2a
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 0
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 1
++      settings:
++        CPU: ARM64
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Facebook: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Facebook: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libwvrxrplugin.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libwvrxrplugin.so.meta
+index 3c4b98b..6679078 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libwvrxrplugin.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/arm64-v8a/libwvrxrplugin.so.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: b9f74c931b37816488053ae202eb1b1c
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: b9f74c931b37816488053ae202eb1b1c
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libGfxWXRUnity.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libGfxWXRUnity.so.meta
+index 8c1130a..5acb5b9 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libGfxWXRUnity.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libGfxWXRUnity.so.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: ba284d6df2b0837448c148c5055a2ec0
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 1
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 0
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: ba284d6df2b0837448c148c5055a2ec0
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 1
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 0
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 1
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libVkLayer_GLES_RenderDoc.1.4.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libVkLayer_GLES_RenderDoc.1.4.so.meta
+index 2c37dc0..b23b7c0 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libVkLayer_GLES_RenderDoc.1.4.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libVkLayer_GLES_RenderDoc.1.4.so.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: 94242a11fe501054f8bc6894133cd036
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 94242a11fe501054f8bc6894133cd036
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libVkLayer_GLES_RenderDoc.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libVkLayer_GLES_RenderDoc.so.meta
+index 3d719ff..b670561 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libVkLayer_GLES_RenderDoc.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libVkLayer_GLES_RenderDoc.so.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: 1bde871bb933f2142b8dc6f6aa8defed
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 1bde871bb933f2142b8dc6f6aa8defed
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libwvrunityxr.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libwvrunityxr.so.meta
+index 4508372..4562785 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libwvrunityxr.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libwvrunityxr.so.meta
+@@ -1,82 +1,88 @@
+-fileFormatVersion: 2
+-guid: a26df3476e51d384abbb3177d3d169e6
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 0
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Facebook: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Facebook: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: a26df3476e51d384abbb3177d3d169e6
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 0
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 1
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Facebook: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Facebook: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libwvrxrplugin.so.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libwvrxrplugin.so.meta
+index 08c2b98..41fc8c9 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libwvrxrplugin.so.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/armeabi-v7a/libwvrxrplugin.so.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: a4b47e18db2a8f745955f30e2fb0e27c
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: a4b47e18db2a8f745955f30e2fb0e27c
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/vr.client.abi.aar.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/vr.client.abi.aar.meta
+index f558e5c..192390d 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/vr.client.abi.aar.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/vr.client.abi.aar.meta
+@@ -1,32 +1,38 @@
+-fileFormatVersion: 2
+-guid: 98d55d0a9dcf4a8488ed518cd51b0bb1
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 1
+-      settings: {}
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        DefaultValueInitialized: true
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 98d55d0a9dcf4a8488ed518cd51b0bb1
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      Android: Android
++    second:
++      enabled: 1
++      settings: {}
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        DefaultValueInitialized: true
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr.common.utils.aar.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr.common.utils.aar.meta
+index a4b3b95..fea80c7 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr.common.utils.aar.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr.common.utils.aar.meta
+@@ -1,32 +1,38 @@
+-fileFormatVersion: 2
+-guid: 8ae14599386951e46b2bafd544b978ec
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 1
+-      settings: {}
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        DefaultValueInitialized: true
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 8ae14599386951e46b2bafd544b978ec
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      Android: Android
++    second:
++      enabled: 1
++      settings: {}
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        DefaultValueInitialized: true
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_client.aar.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_client.aar.meta
+index c0daf26..17a1d0c 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_client.aar.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_client.aar.meta
+@@ -1,32 +1,38 @@
+-fileFormatVersion: 2
+-guid: a7f86fc42d8b2654da4d5adc66361d02
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 0
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 1
+-      settings: {}
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        DefaultValueInitialized: true
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: a7f86fc42d8b2654da4d5adc66361d02
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 0
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      Android: Android
++    second:
++      enabled: 1
++      settings: {}
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        DefaultValueInitialized: true
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_ime_client.aar.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_ime_client.aar.meta
+index 1e771bb..c4120fc 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_ime_client.aar.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_ime_client.aar.meta
+@@ -1,32 +1,38 @@
+-fileFormatVersion: 2
+-guid: 52a209c8612bca94ba8b196a6eaf4812
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 0
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 1
+-      settings: {}
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        DefaultValueInitialized: true
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 52a209c8612bca94ba8b196a6eaf4812
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 0
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      Android: Android
++    second:
++      enabled: 1
++      settings: {}
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        DefaultValueInitialized: true
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_permission_client.aar.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_permission_client.aar.meta
+index e799d6c..e2a8260 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_permission_client.aar.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_permission_client.aar.meta
+@@ -1,32 +1,38 @@
+-fileFormatVersion: 2
+-guid: 592b99ecff1836c4cb8b6145ee9232e9
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 0
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 1
+-      settings: {}
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        DefaultValueInitialized: true
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 592b99ecff1836c4cb8b6145ee9232e9
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 0
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      Android: Android
++    second:
++      enabled: 1
++      settings: {}
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        DefaultValueInitialized: true
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_unity_plugin_2017.aar.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_unity_plugin_2017.aar.meta
+index 997abfe..cdf954c 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_unity_plugin_2017.aar.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_unity_plugin_2017.aar.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: d927981396469d546808704a7cc399c1
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 0
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: x86_64
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: x86
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: x86_64
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: d927981396469d546808704a7cc399c1
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 0
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: x86_64
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: x86
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: x86_64
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_unity_plugin_2022.aar.meta b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_unity_plugin_2022.aar.meta
+index 727ba4d..0965dba 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_unity_plugin_2022.aar.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Android/wvr_unity_plugin_2022.aar.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: 2a2cb19ee52302144b915044da0cf549
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 1
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-        DefaultValueInitialized: true
+-        OS: AnyOS
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: x86_64
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: x86
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: x86_64
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 2a2cb19ee52302144b915044da0cf549
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 1
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++        DefaultValueInitialized: true
++        OS: AnyOS
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: x86_64
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: x86
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: x86_64
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServerManageAPI.dll.meta b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServerManageAPI.dll.meta
+index 6f2f629..51a4a78 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServerManageAPI.dll.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServerManageAPI.dll.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: c592f729cf08f2a498ca510c78438b05
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 0
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 0
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: x86_64
+-        DefaultValueInitialized: true
+-        OS: Windows
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: c592f729cf08f2a498ca510c78438b05
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 0
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 0
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 1
++      settings:
++        CPU: x86_64
++        DefaultValueInitialized: true
++        OS: Windows
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServerReportAPI.dll.meta b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServerReportAPI.dll.meta
+index e6d4e6e..3a95744 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServerReportAPI.dll.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServerReportAPI.dll.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: ba53b87b1ff80f24ea5027bb84e7e172
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 0
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 0
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: x86_64
+-        DefaultValueInitialized: true
+-        OS: Windows
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: ba53b87b1ff80f24ea5027bb84e7e172
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 0
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 0
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 1
++      settings:
++        CPU: x86_64
++        DefaultValueInitialized: true
++        OS: Windows
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
 diff --git a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/DirectPreviewApk.cs b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/DirectPreviewApk.cs
-index 3e7b413..7d1cbe8 100644
+index 3e7b413..39d3168 100644
 --- a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/DirectPreviewApk.cs
 +++ b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/DirectPreviewApk.cs
 @@ -21,6 +21,8 @@ namespace Wave.XR.DirectPreview.Editor
@@ -184,12 +2620,7 @@ index 3e7b413..7d1cbe8 100644
  		private static void GeneralSettings()
  		{
  			PlayerSettings.Android.bundleVersionCode = 1;
-@@ -79,12 +81,11 @@ public static void UninstallSimulatorInner()
- 				UnityEngine.Debug.LogError(e);
- 			}
- 		}
--
-         public static void InstallSimulatorInner()
+@@ -84,7 +86,7 @@ public static void InstallSimulatorInner()
  		{
  			try
  			{
@@ -198,7 +2629,7 @@ index 3e7b413..7d1cbe8 100644
  				UnityEngine.Debug.Log("Install Direct Preview device APK pull path = " + absolutePath);
  
  				Process myProcess = new Process();
-@@ -237,7 +238,7 @@ public static void CreateDirectPreviewFolderInner()
+@@ -237,7 +239,7 @@ public static void CreateDirectPreviewFolderInner()
  
  		private static string configPath()
  		{
@@ -230,10 +2661,10 @@ index 8d2d50f..208781b 100644
  
  					UnityEngine.Debug.Log("StreamingServer in " + absolutePath);
 diff --git a/com.htc.upm.wave.xrsdk/Runtime/WaveXRConstants.cs b/com.htc.upm.wave.xrsdk/Runtime/WaveXRConstants.cs
-index f0138bb..9c14b9b 100644
+index f0138bb..3e3bdc9 100644
 --- a/com.htc.upm.wave.xrsdk/Runtime/WaveXRConstants.cs
 +++ b/com.htc.upm.wave.xrsdk/Runtime/WaveXRConstants.cs
-@@ -14,11 +14,13 @@ public static class Constants
+@@ -14,6 +14,8 @@ public static class Constants
  		public const string SDKPackageName = "com.htc.upm.wave.xrsdk";
  		public const string NativePackageName = "com.htc.upm.wave.native";
  		public const string EssencePackageName = "com.htc.upm.wave.essence";
@@ -242,46 +2673,631 @@ index f0138bb..9c14b9b 100644
  
  		/// <summary>
  		/// Key we use to store and retrieve custom configuration settings from EditorBuildSettings
- 		/// </summary>
--		public const string k_SettingsKey = SDKPackageName + ".xrsettings";
-+		public const string k_SettingsKey = CombinedPackageName + ".xrsettings";
- 
- 		// This error code need map to native's ErrorCode.
- 		public enum ErrorCode
-diff --git a/com.htc.upm.wave.xrsdk/package.json.meta b/package.json.meta
-similarity index 72%
-rename from com.htc.upm.wave.xrsdk/package.json.meta
-rename to package.json.meta
-index 9eba498..7173170 100644
---- a/com.htc.upm.wave.xrsdk/package.json.meta
-+++ b/package.json.meta
-@@ -1,5 +1,5 @@
- fileFormatVersion: 2
--guid: 1213ae13dd8b34ed284477fb03a403a8
-+guid: b69bc215af6354648b30200876976ce9
- PackageManifestImporter:
-   externalObjects: {}
-   userData: 
-diff --git a/com.htc.upm.wave.essence/package.json.meta b/com.htc.upm.wave.essence.meta
-similarity index 57%
-rename from com.htc.upm.wave.essence/package.json.meta
-rename to com.htc.upm.wave.essence.meta
-index bc9bc83..7f4f8d3 100644
---- a/com.htc.upm.wave.essence/package.json.meta
-+++ b/com.htc.upm.wave.essence.meta
-@@ -1,7 +1,8 @@
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/VSWLogDynamic64U.dll.meta b/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/VSWLogDynamic64U.dll.meta
+index d26a9cd..ceb32d5 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/VSWLogDynamic64U.dll.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/VSWLogDynamic64U.dll.meta
+@@ -1,70 +1,76 @@
 -fileFormatVersion: 2
--guid: 71d0e0d6219e3ce489aab5ec15198d85
--PackageManifestImporter:
+-guid: 3efa51294b7974147a72b2c3621952c9
+-PluginImporter:
 -  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 0
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: x86_64
+-        DefaultValueInitialized: true
+-        OS: Windows
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
 -  userData: 
 -  assetBundleName: 
 -  assetBundleVariant: 
 +fileFormatVersion: 2
-+guid: 75d6dcfd1871fda44a0bbf8e2955a2da
-+folderAsset: yes
-+DefaultImporter:
++guid: 3efa51294b7974147a72b2c3621952c9
++PluginImporter:
 +  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 0
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 1
++      settings:
++        CPU: x86_64
++        DefaultValueInitialized: true
++        OS: Windows
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/VSWPipeVarClient64U_MT.dll.meta b/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/VSWPipeVarClient64U_MT.dll.meta
+index ad3d98e..e913051 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/VSWPipeVarClient64U_MT.dll.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/VSWPipeVarClient64U_MT.dll.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: d238071a373cd3e4bb3f0da6cd2a4776
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 0
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: x86_64
+-        DefaultValueInitialized: true
+-        OS: Windows
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: d238071a373cd3e4bb3f0da6cd2a4776
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 0
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 1
++      settings:
++        CPU: x86_64
++        DefaultValueInitialized: true
++        OS: Windows
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/wvr_plugins_directpreview.dll.meta b/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/wvr_plugins_directpreview.dll.meta
+index 1a22acc..83e9c85 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/wvr_plugins_directpreview.dll.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/wvr_plugins_directpreview.dll.meta
+@@ -1,70 +1,76 @@
+-fileFormatVersion: 2
+-guid: af5af9e7d07997f4584f11a86d217442
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 0
+-        Exclude Linux64: 1
+-        Exclude OSXUniversal: 1
+-        Exclude Win: 1
+-        Exclude Win64: 1
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: x86_64
+-        DefaultValueInitialized: true
+-        OS: Windows
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: af5af9e7d07997f4584f11a86d217442
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 0
++        Exclude Linux64: 1
++        Exclude OSXUniversal: 1
++        Exclude Win: 1
++        Exclude Win64: 1
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 1
++      settings:
++        CPU: x86_64
++        DefaultValueInitialized: true
++        OS: Windows
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/wvrunityxr.dll.meta b/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/wvrunityxr.dll.meta
+index ca83550..99136ea 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/wvrunityxr.dll.meta
++++ b/com.htc.upm.wave.xrsdk/Runtime/Windows/x64/wvrunityxr.dll.meta
+@@ -1,82 +1,88 @@
+-fileFormatVersion: 2
+-guid: 8f605099c78958441addb11ecba700a6
+-PluginImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  iconMap: {}
+-  executionOrder: {}
+-  defineConstraints: []
+-  isPreloaded: 0
+-  isOverridable: 1
+-  isExplicitlyReferenced: 0
+-  validateReferences: 1
+-  platformData:
+-  - first:
+-      : Any
+-    second:
+-      enabled: 0
+-      settings:
+-        Exclude Android: 1
+-        Exclude Editor: 0
+-        Exclude Linux64: 0
+-        Exclude OSXUniversal: 0
+-        Exclude Win: 1
+-        Exclude Win64: 0
+-  - first:
+-      Android: Android
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: ARMv7
+-  - first:
+-      Any: 
+-    second:
+-      enabled: 0
+-      settings: {}
+-  - first:
+-      Editor: Editor
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: x86_64
+-        DefaultValueInitialized: true
+-        OS: Windows
+-  - first:
+-      Facebook: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Facebook: Win64
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: Linux64
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: OSXUniversal
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: AnyCPU
+-  - first:
+-      Standalone: Win
+-    second:
+-      enabled: 0
+-      settings:
+-        CPU: None
+-  - first:
+-      Standalone: Win64
+-    second:
+-      enabled: 1
+-      settings:
+-        CPU: AnyCPU
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 8f605099c78958441addb11ecba700a6
++PluginImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  iconMap: {}
++  executionOrder: {}
++  defineConstraints: []
++  isPreloaded: 0
++  isOverridable: 1
++  isExplicitlyReferenced: 0
++  validateReferences: 1
++  platformData:
++  - first:
++      : Any
++    second:
++      enabled: 0
++      settings:
++        Exclude Android: 1
++        Exclude Editor: 0
++        Exclude Linux64: 0
++        Exclude OSXUniversal: 0
++        Exclude Win: 1
++        Exclude Win64: 0
++  - first:
++      Android: Android
++    second:
++      enabled: 0
++      settings:
++        CPU: ARMv7
++  - first:
++      Any: 
++    second:
++      enabled: 0
++      settings: {}
++  - first:
++      Editor: Editor
++    second:
++      enabled: 1
++      settings:
++        CPU: x86_64
++        DefaultValueInitialized: true
++        OS: Windows
++  - first:
++      Facebook: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Facebook: Win64
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: Linux64
++    second:
++      enabled: 1
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: OSXUniversal
++    second:
++      enabled: 1
++      settings:
++        CPU: AnyCPU
++  - first:
++      Standalone: Win
++    second:
++      enabled: 0
++      settings:
++        CPU: None
++  - first:
++      Standalone: Win64
++    second:
++      enabled: 1
++      settings:
++        CPU: AnyCPU
++  - first:
++      Windows Store Apps: WindowsStoreApps
++    second:
++      enabled: 0
++      settings:
++        CPU: AnyCPU
 +  userData: 
 +  assetBundleName: 
 +  assetBundleVariant: 
