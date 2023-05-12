@@ -262,3 +262,26 @@ index 9eba498..7173170 100644
  PackageManifestImporter:
    externalObjects: {}
    userData: 
+diff --git a/com.htc.upm.wave.essence/package.json.meta b/com.htc.upm.wave.essence.meta
+similarity index 57%
+rename from com.htc.upm.wave.essence/package.json.meta
+rename to com.htc.upm.wave.essence.meta
+index bc9bc83..7f4f8d3 100644
+--- a/com.htc.upm.wave.essence/package.json.meta
++++ b/com.htc.upm.wave.essence.meta
+@@ -1,7 +1,8 @@
+-fileFormatVersion: 2
+-guid: 71d0e0d6219e3ce489aab5ec15198d85
+-PackageManifestImporter:
+-  externalObjects: {}
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
++fileFormatVersion: 2
++guid: 75d6dcfd1871fda44a0bbf8e2955a2da
++folderAsset: yes
++DefaultImporter:
++  externalObjects: {}
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
