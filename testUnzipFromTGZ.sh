@@ -104,6 +104,7 @@ function patch_for_combined_package {
     echo "all files in packages"
     ls files_to_copy_to_repo/packag*
     cp files_to_copy_to_repo/packag* "$outputdirectory/"
+    cp files_to_copy_to_repo/com.htc*meta "$outputdirectory/"
 }
 function commit_combined_branch {
     local outputdirectory="$1"
