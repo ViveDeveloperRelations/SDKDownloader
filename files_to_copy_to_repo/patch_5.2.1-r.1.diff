@@ -105,7 +105,7 @@ index 46006c7..0c7ae2b 100644
  			}
  
 diff --git a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs
-index f75e9ea..b31d9d5 100644
+index f75e9ea..bb1c8ed 100644
 --- a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs
 +++ b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs
 @@ -359,7 +359,7 @@ internal void AddViveSDKVersion()
@@ -113,7 +113,7 @@ index f75e9ea..b31d9d5 100644
  				var newUsesFeature = CreateElement("meta-data");
  				newUsesFeature.Attributes.Append(CreateAndroidAttribute("name", "com.htc.ViveWaveAndroid.SdkVersion"));
 -				newUsesFeature.Attributes.Append(CreateAndroidAttribute("value", SearchPackageVersion("com.htc.upm.wave.xrsdk")));
-+				newUsesFeature.Attributes.Append(CreateAndroidAttribute("value", SearchPackageVersion("com.htc.upm.wave.nativecombined")));
++				newUsesFeature.Attributes.Append(CreateAndroidAttribute("value", SearchPackageVersion(Constants.CombinedPackageName)));
  				ApplicationElement.AppendChild(newUsesFeature);
  			}
  
