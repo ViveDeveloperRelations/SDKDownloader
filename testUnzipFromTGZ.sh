@@ -148,22 +148,22 @@ for version in "${version_numbers[@]}"; do
 
     extract_packages $outputdirectorybase $version "${package_names[@]}" 
     commit_main_branch $outputdirectorybase $version
-    patch_for_combined_package $outputdirectorybase
-    commit_combined_branch $outputdirectorybase $version
+    #patch_for_combined_package $outputdirectorybase
+    #commit_combined_branch $outputdirectorybase $version
 
     mainbranch="master"
-    git -C "$outputdirectorybase" checkout "$mainbranch"
+    #git -C "$outputdirectorybase" checkout "$mainbranch"
 done
 
 
 function push_to_remote {
     local outputdirectorybase="$1"
-    #origin=https://github.com/ViveDeveloperRelations/WaveNativeIndividual.git
-    origin=https://github.com/ViveDeveloperRelations/WaveCombined_test.git
+    origin=https://github.com/ViveDeveloperRelations/WaveNativeIndividual.git
+    #origin=https://github.com/ViveDeveloperRelations/WaveCombined_test.git
     git -C "$outputdirectorybase" remote add origin $origin
     git -C "$outputdirectorybase" push origin master --force
     #https://github.com/ViveDeveloperRelations/WaveNativeIndividual.git
     git -C "$outputdirectorybase" push --tags --force
 }
 
-#push_to_remote "$outputdirectorybase"
+push_to_remote "$outputdirectorybase"
