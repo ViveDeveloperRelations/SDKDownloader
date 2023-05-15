@@ -60,9 +60,7 @@ function get_version_numbers {
 #populate version numbers based on versions seen in tgz files
 
 tgzdirectory="com.htc.upm.wave.essence/"
-#version_numbers=($(get_version_numbers $tgzdirectory))
-#TEMP: HACK: hardcode version numbers for now to keep the iteration faster
-version_numbers=( "5.2.1-r.1" )
+version_numbers=($(get_version_numbers $tgzdirectory))
 
 # extract packages from their downloaded locations to a git repo and check them in
 function extract_packages {
