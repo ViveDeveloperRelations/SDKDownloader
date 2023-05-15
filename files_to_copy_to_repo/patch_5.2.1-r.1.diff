@@ -1,0 +1,170 @@
+diff --git a/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs b/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs
+index 82656fe..067f8a7 100644
+--- a/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs
++++ b/com.htc.upm.wave.essence/Editor/EssenceSettingsProvider.cs
+@@ -801,23 +801,26 @@ public static void CleanHouse()
+ 			if (File.Exists("Assets/Wave.meta"))
+ 				File.Delete("Assets/Wave.meta");
+ 		}
+-
++		internal static string GetEssenceUnityPackageFolder()
++		{
++			return Constants.PackagesRootFolder + "/" + Constants.EssencePackageName+ "/UnityPackages~";
++		}
+ 		internal static void UpdateModule(string ModelPath, string packagePath)
+ 		{
+ 			DeleteFolder(ModelPath);
+ 			AssetDatabase.Refresh();
+-			string target = Path.Combine("Packages/" + Constants.EssencePackageName + "/UnityPackages~", packagePath);
++			string target = Path.Combine(GetEssenceUnityPackageFolder(), packagePath);
+ 			Debug.Log("Import: " + target);
+ 			AssetDatabase.ImportPackage(target, false);
+ 		}
+ 
+ 		internal static void ImportModule(string packagePath)
+ 		{
+-			string target = Path.Combine("Packages/" + Constants.EssencePackageName + "/UnityPackages~", packagePath);
++			string target = Path.Combine(GetEssenceUnityPackageFolder(), packagePath);
+ 			Debug.Log("Import: " + target);
+ 			AssetDatabase.ImportPackage(target, false);
+ 		}
+-
++		
+ 		[SettingsProvider]
+ 		static SettingsProvider Create()
+ 		{
+diff --git a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs
+index 46006c7..0c7ae2b 100644
+--- a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs
++++ b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildCheck.cs
+@@ -31,10 +31,12 @@ static class CustomBuildProcessor
+ 	{
+ 		private static string WaveXRPath = "Assets/Wave/XR";
+ 
++		const string XRSDKPackageRoot = Constants.PackagesRootFolder + "/" + Constants.SDKPackageName;
++		
+ 		const string CustomAndroidManifestPathSrc = "/Platform/Android/AndroidManifest.xml";
+-		const string AndroidManifestPathSrc = "Packages/" + Constants.SDKPackageName + "/Runtime/Android/AndroidManifest.xml";
+-		const string Aar2017PathSrc = "Packages/" + Constants.SDKPackageName + "/Runtime/Android/wvr_unity_plugin_2017.aar";
+-		const string Aar2022PathSrc = "Packages/" + Constants.SDKPackageName + "/Runtime/Android/wvr_unity_plugin_2022.aar";
++		const string AndroidManifestPathSrc = XRSDKPackageRoot + "/Runtime/Android/AndroidManifest.xml";
++		const string Aar2017PathSrc = XRSDKPackageRoot + "/Runtime/Android/wvr_unity_plugin_2017.aar";
++		const string Aar2022PathSrc = XRSDKPackageRoot + "/Runtime/Android/wvr_unity_plugin_2022.aar";
+ 		const string AndroidManifestPathDest = "Assets/Plugins/Android/AndroidManifest.xml";
+ 		const string AndroidManifestScriptCreatedPath = "Assets/Plugins/Android/AndroidManifest.IsCreatedByScript";
+ 		const string Aar2017PathDest = "Assets/Plugins/Android/wvr_unity_plugin_2017.aar";
+@@ -291,7 +293,7 @@ static void CopyAndroidManifest()
+ 			}
+ 			else if (File.Exists(AndroidManifestPathSrc))
+ 			{
+-				Debug.Log("Using the Android Manifest at Packages/com.htc.upm.wave.xrsdk/Runtime/Android");
++				Debug.Log("Using the Android Manifest at " + AndroidManifestPathSrc);
+ 				File.Copy(AndroidManifestPathSrc, AndroidManifestPathDest, false);
+ 			}
+ 
+diff --git a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs
+index f75e9ea..bb1c8ed 100644
+--- a/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs
++++ b/com.htc.upm.wave.xrsdk/Editor/WaveXRBuildProcessor.cs
+@@ -359,7 +359,7 @@ internal void AddViveSDKVersion()
+ 			{
+ 				var newUsesFeature = CreateElement("meta-data");
+ 				newUsesFeature.Attributes.Append(CreateAndroidAttribute("name", "com.htc.ViveWaveAndroid.SdkVersion"));
+-				newUsesFeature.Attributes.Append(CreateAndroidAttribute("value", SearchPackageVersion("com.htc.upm.wave.xrsdk")));
++				newUsesFeature.Attributes.Append(CreateAndroidAttribute("value", SearchPackageVersion(Constants.CombinedPackageName)));
+ 				ApplicationElement.AppendChild(newUsesFeature);
+ 			}
+ 
+diff --git a/com.htc.upm.wave.xrsdk/Editor/WaveXRMetadata.cs b/com.htc.upm.wave.xrsdk/Editor/WaveXRMetadata.cs
+index 9952fc7..fa241a9 100644
+--- a/com.htc.upm.wave.xrsdk/Editor/WaveXRMetadata.cs
++++ b/com.htc.upm.wave.xrsdk/Editor/WaveXRMetadata.cs
+@@ -35,7 +35,7 @@ internal static WaveXRPackageMetadata CreateAndGetMetadata()
+             {
+                 s_Metadata = new WaveXRPackageMetadata();
+                 s_Metadata.packageName = "Wave XRSDK Package";
+-                s_Metadata.packageId = Constants.SDKPackageName;
++                s_Metadata.packageId = Constants.CombinedPackageName;
+                 s_Metadata.settingsType = typeof(WaveXRSettings).FullName;
+ 
+                 s_Metadata.loaderMetadata = new List<IXRLoaderMetadata>() {
+diff --git a/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs b/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs
+index 84d2860..99909f2 100644
+--- a/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs
++++ b/com.htc.upm.wave.xrsdk/Editor/XRSDKSettingsProvider.cs
+@@ -126,7 +126,8 @@ public static void CleanHouse()
+ 
+ 		private void ImportModule(string packagePath)
+ 		{
+-			string target = Path.Combine("Packages/com.htc.upm.wave.xrsdk/UnityPackages~", packagePath);
++			const string xrsdkUnityPackagesFolder = Constants.PackagesRootFolder + "/" + Constants.SDKPackageName+"/UnityPackages~";
++			string target = Path.Combine(xrsdkUnityPackagesFolder, packagePath);
+ 			Debug.Log("Import: " + target);
+ 			AssetDatabase.ImportPackage(target, false);
+ 		}
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/DirectPreviewApk.cs b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/DirectPreviewApk.cs
+index 3e7b413..39d3168 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/DirectPreviewApk.cs
++++ b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/DirectPreviewApk.cs
+@@ -21,6 +21,8 @@ namespace Wave.XR.DirectPreview.Editor
+ {
+ 	public class DirectPreviewAPK
+ 	{
++		internal const string DirectPreviewBinaryFolderRoot = Constants.PackagesRootFolder + "/" + Constants.SDKPackageName +
++		                                                     "/Runtime/DirectPreview/Binary";
+ 		private static void GeneralSettings()
+ 		{
+ 			PlayerSettings.Android.bundleVersionCode = 1;
+@@ -84,7 +86,7 @@ public static void InstallSimulatorInner()
+ 		{
+ 			try
+ 			{
+-				var absolutePath = Path.GetFullPath("Packages/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRClient/Vive_rrClient.apk");
++				var absolutePath = Path.GetFullPath(DirectPreviewBinaryFolderRoot+"/RRClient/Vive_rrClient.apk");
+ 				UnityEngine.Debug.Log("Install Direct Preview device APK pull path = " + absolutePath);
+ 
+ 				Process myProcess = new Process();
+@@ -237,7 +239,7 @@ public static void CreateDirectPreviewFolderInner()
+ 
+ 		private static string configPath()
+ 		{
+-			var absolutePath = Path.GetFullPath("Packages/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/DirectPreviewConfig.json");
++			var absolutePath = Path.GetFullPath(DirectPreviewBinaryFolderRoot+"/DirectPreviewConfig.json");
+ 			UnityEngine.Debug.Log("configPath = " + absolutePath);
+ 
+ 			return absolutePath;
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/StreamingServer.cs b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/StreamingServer.cs
+index 8d2d50f..208781b 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/StreamingServer.cs
++++ b/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Editor/StreamingServer.cs
+@@ -38,7 +38,7 @@ static void StopStreamingServerMenu()
+ 
+ 		public static bool isStreamingServerExist()
+ 		{
+-			var absolutePath = Path.GetFullPath("Packages/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServer/RRserver.exe");
++			var absolutePath = Path.GetFullPath(DirectPreviewAPK.DirectPreviewBinaryFolderRoot+ "/RRServer/RRserver.exe");
+ 
+ 			UnityEngine.Debug.Log("StreamingServer pull path = " + absolutePath);
+ 
+@@ -52,7 +52,7 @@ public static void StartStreamingServer()
+ 			{
+ 				try
+ 				{
+-					var absolutePath = Path.GetFullPath("Packages/com.htc.upm.wave.xrsdk/Runtime/DirectPreview/Binary/RRServer");
++					var absolutePath = Path.GetFullPath(DirectPreviewAPK.DirectPreviewBinaryFolderRoot+"/RRServer");
+ 					var driveStr = absolutePath.Substring(0, 2);
+ 
+ 					UnityEngine.Debug.Log("StreamingServer in " + absolutePath);
+diff --git a/com.htc.upm.wave.xrsdk/Runtime/WaveXRConstants.cs b/com.htc.upm.wave.xrsdk/Runtime/WaveXRConstants.cs
+index f0138bb..3e3bdc9 100644
+--- a/com.htc.upm.wave.xrsdk/Runtime/WaveXRConstants.cs
++++ b/com.htc.upm.wave.xrsdk/Runtime/WaveXRConstants.cs
+@@ -14,6 +14,8 @@ public static class Constants
+ 		public const string SDKPackageName = "com.htc.upm.wave.xrsdk";
+ 		public const string NativePackageName = "com.htc.upm.wave.native";
+ 		public const string EssencePackageName = "com.htc.upm.wave.essence";
++		public const string CombinedPackageName = "com.htc.upm.wave.nativecombined";
++		public const string PackagesRootFolder = "Packages/" + CombinedPackageName;
+ 
+ 		/// <summary>
+ 		/// Key we use to store and retrieve custom configuration settings from EditorBuildSettings
